@@ -318,7 +318,8 @@ class Parcel {
 
                             var _load = system.load_shader( _shader.id, {
                                 frag_id: _shader.frag_id,
-                                vert_id: _shader.vert_id
+                                vert_id: _shader.vert_id,
+                                vertex_attributes: _shader.vertex_attributes
                             });
 
                             _handle(_shader.id, _load);

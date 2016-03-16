@@ -294,6 +294,7 @@ class Shader extends Resource {
     public var shader : GLShader;
 
     public var no_default_uniforms : Bool = false;
+    public var vertex_attributes : Array<String>;
     public var proj_attribute : Location;
     public var view_attribute : Location;
 
@@ -310,6 +311,7 @@ class Shader extends Resource {
         frag_id = _options.frag_id;
         vert_id = _options.vert_id;
         no_default_uniforms = def(_options.no_default_uniforms, false);
+        vertex_attributes = _options.vertex_attributes;
 
         uniforms = new Uniforms();
 
@@ -322,7 +324,7 @@ class Shader extends Resource {
         uniforms.apply();
 
             //I dont remember what this was doing here exactly
-        Luxe.renderer.state.activeTexture(GL.TEXTURE0);
+        //Luxe.renderer.state.activeTexture(GL.TEXTURE0);
 
     } //activate
 
@@ -437,10 +439,16 @@ class Shader extends Resource {
         GL.attachShader(program, frag_shader);
 
             //Now we want to ensure that our locations are static
-        GL.bindAttribLocation( program, Batcher.vert_attribute,    'vertexPosition');
-        GL.bindAttribLocation( program, Batcher.tcoord_attribute,  'vertexTCoord');
-        GL.bindAttribLocation( program, Batcher.color_attribute,   'vertexColor');
-        GL.bindAttribLocation( program, Batcher.normal_attribute,  'vertexNormal');
+        if (vertex_attributes != null) {
+            for (i in 0...vertex_attributes.length) {
+                GL.bindAttribLocation(program, i, vertex_attributes[i]);
+            }
+        } else {
+            GL.bindAttribLocation( program, Batcher.vert_attribute,    'vertexPosition');
+            GL.bindAttribLocation( program, Batcher.tcoord_attribute,  'vertexTCoord');
+            GL.bindAttribLocation( program, Batcher.color_attribute,   'vertexColor');
+            GL.bindAttribLocation( program, Batcher.normal_attribute,  'vertexNormal');
+        }
 
         GL.linkProgram(program);
 

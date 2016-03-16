@@ -309,7 +309,8 @@ class Resources {
             id: _id,
             system: this,
             frag_id: _options.frag_id,
-            vert_id: _options.vert_id
+            vert_id: _options.vert_id,
+            vertex_attributes: _options.vertex_attributes
         });
 
         add(_resource);

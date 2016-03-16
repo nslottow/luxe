@@ -154,6 +154,8 @@ typedef ShaderOptions = {
             /** Set this to avoid setting any default
                 uniforms initially or each frame */
         @:optional var no_default_uniforms : Bool;
+            /** Set this to specify custom vertex attributes in order ascending from 0 */
+        @:optional var vertex_attributes : Array<String>;
 
     }    
 
