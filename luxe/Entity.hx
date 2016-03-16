@@ -1,6 +1,6 @@
 package luxe;
 
-import Luxe.Ev;
+import luxe.Ev;
 import luxe.Quaternion;
 import luxe.Transform;
 import luxe.Matrix;
@@ -137,7 +137,7 @@ class Entity extends Objects {
         _verbose('create new entity with options ' + options);
 
         _components = new Components( this );
-        children = new Array<Entity>();
+        children = [];
         events = new luxe.Events();
 
         if(options != null && options.transform != null) {
@@ -488,7 +488,7 @@ class Entity extends Objects {
 
 //events
 
-    inline function _find_emit_source(?_from_unlisten:Bool=false) : Emitter<Luxe.Ev> {
+    inline function _find_emit_source(?_from_unlisten:Bool=false) : Emitter<luxe.Ev> {
 
         var source = null;
 
