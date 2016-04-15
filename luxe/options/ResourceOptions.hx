@@ -146,7 +146,7 @@ typedef ShaderOptions = {
     } //LoadFontOptions
 
     typedef LoadShaderOptions = {
-            
+
             /** The fragment shader asset id */
         var frag_id : String;
             /** The vertex shader asset id */
@@ -157,10 +157,10 @@ typedef ShaderOptions = {
             /** Set this to specify custom vertex attributes in order ascending from 0 */
         @:optional var vertex_attributes : Array<String>;
 
-    }    
+    }
 
     typedef LoadAudioOptions = {
-            
+
         @:optional var is_stream : Bool;
 
     }

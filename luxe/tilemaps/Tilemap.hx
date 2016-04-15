@@ -88,7 +88,7 @@ class TilemapVisual {
     } //update_tile_id
 
         /** Update the visual to match a new tile id at a given coordinate.
-            This is called automatically when you set a `Tile` ID in a map, if it has a visual assigned. 
+            This is called automatically when you set a `Tile` ID in a map, if it has a visual assigned.
             _angle has to be a multiple of 90 */
     public function refresh_tile_id( _layer_name:String, _x:Int, _y:Int, _id:Int, _flipx:Bool = false, _flipy:Bool = false, _angle:Int = 0) {
 
@@ -178,7 +178,6 @@ class Tile {
     public var uuid : String;
     public var x : Int;
     public var y : Int;
-    public var pos : Vector;
     public var size : Vector;
     @:isVar public var flipx(default, set):Bool;
     @:isVar public var flipy(default, set):Bool;
@@ -213,12 +212,11 @@ class Tile {
             size = new Vector( map.tile_width, map.tile_height );
         }
 
-        pos = new Vector( map.pos.x + (size.x * x), map.pos.y + (size.y * y) );
-
     } //new
 
     function toString() {
-        return 'Tile: id:$id x,y:$x,$y layer(${layer.name}) coord($x,$y) pos(${pos.x},${pos.y}) size(${size.x},${size.y}) flipx,flipy:$flipx,$flipy angle:$angle';
+        var _pos = map.tile_pos(x,y);
+        return 'Tile: id:$id x,y:$x,$y layer(${layer.name}) coord($x,$y) pos(${_pos.x},${_pos.y}) size(${size.x},${size.y}) flipx,flipy:$flipx,$flipy angle:$angle';
     }
 
     function set_id( _id:Int ) {
@@ -267,7 +265,8 @@ class Tile {
 
 class TileLayer {
 
-        /** the depth/ordering value */
+        /** the depth/ordering value. 
+            (WIP: Ortho TilemapVisual uses (at create): tile render depth = tilemap.depth + (`layer`/layer count)) */
     public var layer : Int;
         /** the unique id of the layer */
     public var id : String;
@@ -307,7 +306,7 @@ class TileLayer {
     } //new
 
 
-        /** Returns a list of rectangles in tile space, 
+        /** Returns a list of rectangles in tile space,
             where any tile with id > 0 is combined into bounding regions */
     public function bounds_fitted():Array<Rectangle> {
 
@@ -550,7 +549,7 @@ class Tilemap {
     } //inside
 
         /** Get the world space position of a tile coordinate, from a given layer. */
-    public function tile_pos( layer_name:String, x:Int, y:Int, ?scale:Float=1.0, ?offset_x:TileOffset, ?offset_y:TileOffset ) {
+    public function tile_pos( x:Int, y:Int, ?scale:Float=1.0, ?offset_x:TileOffset, ?offset_y:TileOffset ) {
 
         if(inside(x,y)) {
 
@@ -578,55 +577,53 @@ class Tilemap {
 
     } //tile_pos
 
-        /** Returns the tile at a given world position, or null */
-    public function tile_at_pos( layer_name:String, worldpos:Vector, ?_scale:Float = 1.0 ) {
+        /** Convert a world space position to tile space coords */
+    public function tile_coord( _world_pos_x:Float, _world_pos_y:Float, ?_scale:Float = 1.0, ?_rounded:Bool=true ) : Vector {
 
-        switch(orientation) {
+         return switch(orientation) {
+
+            case TilemapOrientation.ortho: {
+                Ortho.worldpos_to_tile_coord( _world_pos_x - pos.x, _world_pos_y - pos.y, tile_width, tile_height, _scale, _rounded );
+            }
+
+            case TilemapOrientation.isometric: {
+                Isometric.worldpos_to_tile_coord( _world_pos_x - pos.x, _world_pos_y - pos.y, tile_width, tile_height, _scale, _rounded );
+            }
+
+            default: null;
+
+        } //switch orientation
+
+    } //tile_coord
+
+        /** Returns the tile at a given world position. 
+            Returns null if not in the tilemap, or no tile exists at the position, for that layer */
+    public function tile_at_pos( layer_name:String, _world_pos_x:Float, _world_pos_y:Float, ?_scale:Float = 1.0 ) : Tile {
+
+        return switch(orientation) {
 
             case TilemapOrientation.ortho: {
 
-                var _tile_pos = Ortho.worldpos_to_tile_coord( worldpos.x - pos.x, worldpos.y - pos.y, tile_width, tile_height, _scale );
-                return tile_at( layer_name, Math.floor(_tile_pos.x), Math.floor(_tile_pos.y) );
+                var _tile_pos = Ortho.worldpos_to_tile_coord( _world_pos_x - pos.x, _world_pos_y - pos.y, tile_width, tile_height, _scale );
+                
+                tile_at( layer_name, Math.floor(_tile_pos.x), Math.floor(_tile_pos.y) );
 
             } //ortho
 
             case TilemapOrientation.isometric: {
 
-                var _tile_pos = Isometric.worldpos_to_tile_coord( worldpos.x - pos.x, worldpos.y - pos.y, tile_width, tile_height, _scale );
-                return tile_at( layer_name, Math.floor(_tile_pos.x), Math.floor(_tile_pos.y) );
+                var _tile_pos = Isometric.worldpos_to_tile_coord( _world_pos_x - pos.x, _world_pos_y - pos.y, tile_width, tile_height, _scale );
+                
+                tile_at( layer_name, Math.floor(_tile_pos.x), Math.floor(_tile_pos.y) );
 
             } //isometric
 
-            default: {
-
-            }
+            default: null;
 
         } //switch orientation
-
-        return null;
 
     } //tile_at_pos
 
-        /** Convert a world space position to map space coords */
-    public function worldpos_to_map( worldpos:Vector, ?_scale:Float = 1.0 ) {
-
-         switch(orientation) {
-
-            case TilemapOrientation.ortho: {
-                return Ortho.worldpos_to_tile_coord( worldpos.x - pos.x, worldpos.y - pos.y, tile_width, tile_height, _scale );
-            }
-
-            case TilemapOrientation.isometric: {
-                return Isometric.worldpos_to_tile_coord( worldpos.x - pos.x, worldpos.y - pos.y, tile_width, tile_height, _scale );
-            }
-
-            default:{}
-
-        } //switch orientation
-
-        return null;
-
-    } //worldpos_to_map
 
         /** Fetch a layer by name, or null if it's not found */
     public function layer( layer_name:String ) {
@@ -639,7 +636,7 @@ class Tilemap {
     }
 
         /** Return a tile from a layer, at the given tile coordinates */
-    public function tile_at( layer_name:String, x:Int, y:Int ) {
+    public function tile_at( layer_name:String, x:Int, y:Int ) : Tile {
 
         if( inside(x,y) ) {
             var _layer = layers.get(layer_name);
@@ -885,7 +882,7 @@ class Tilemap {
     } //get_total_width
 
         /** Get the total height of the tilemap in tile height space */
-    
+
     function get_total_height() : Int {
 
         return height * tile_height;
