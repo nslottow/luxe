@@ -118,7 +118,7 @@ class TiledTileset {
 
                     case "tile" : {
                         var _tile_id:Int = cast Reflect.field(child, "id");
-                        var _tile_props:Map<String, String> = new Map<String, String>();
+                        var _tile_props:Map<String, Dynamic> = new Map<String, Dynamic>();
 
                             var tile_fields = Reflect.fields(child);
                             for(tile_node in tile_fields) {
@@ -138,13 +138,13 @@ class TiledTileset {
 					case "tileproperties" : {
 						var tile_id_strs = Reflect.fields(child);
 						for (tile_id_str in tile_id_strs) {
-							var tile_id = Std.parseInt(tile_id_str);
-							var tile_props = new Map<String, String>();
+							var tile_id = Std.parseInt(tile_id_str) ;
+							var tile_props = new Map<String, Dynamic>();
 
 							var properties = Reflect.field(child, tile_id_str);
 							for (property_name in Reflect.fields(properties)) {
 								var value:String = cast Reflect.field(properties, property_name);
-								trace('tile property, id_str = $tile_id_str, id = $tile_id, value = $value');
+								trace('tile property, id_str = $tile_id_str, id = $tile_id, key = $property_name, value = $value');
 								tile_props.set(property_name, value);
 							}
 

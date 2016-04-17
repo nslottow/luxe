@@ -213,13 +213,15 @@ class TiledObjectGroup {
     public var visible : Bool = true;
     public var opacity : Float = 1.0;
     public var color:String = '';
-    public var properties:Map<String, String>;
+    public var properties:Map<String, Dynamic>;
+	public var propertytypes:Map<String, String>;
     public var objects : Array<TiledObject>;
 
     public function new( _map:TiledMapData ) {
         map = _map;
 
-        properties = new Map();
+        properties = new Map<String, Dynamic>();
+		propertytypes = new Map<String, String>();
         objects = [];
 
     } //new
@@ -286,9 +288,15 @@ class TiledObjectGroup {
                         } //for each property
                     } //properties
 
+					case "propertytypes" : {
+						var child_fields = Reflect.fields(child);
+						for (property_name in child_fields) {
+							propertytypes.set(property_name, Reflect.field(child, property_name));
+						} //for each property
+					} //propertytypes
+
                 } //switch
         } //for each field
     } //from_json
-
 
 } //TiledObjectGroup

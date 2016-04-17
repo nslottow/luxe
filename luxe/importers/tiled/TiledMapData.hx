@@ -219,9 +219,9 @@ class TiledMapData {
 class TiledPropertyTile {
 
     public var id:Int;
-    public var properties:Map<String, String>;
+    public var properties:Map<String, Dynamic>;
 
-    public function new(_id:Int, _properties:Map<String, String>) {
+    public function new(_id:Int, _properties:Map<String, Dynamic>) {
         id = _id;
         properties = _properties;
     }
