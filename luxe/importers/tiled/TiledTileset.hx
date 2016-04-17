@@ -135,6 +135,24 @@ class TiledTileset {
 
                     } //tile
 
+					case "tileproperties" : {
+						var tile_id_strs = Reflect.fields(child);
+						for (tile_id_str in tile_id_strs) {
+							var tile_id = Std.parseInt(tile_id_str);
+							var tile_props = new Map<String, String>();
+
+							var properties = Reflect.field(child, tile_id_str);
+							for (property_name in Reflect.fields(properties)) {
+								var value:String = cast Reflect.field(properties, property_name);
+								trace('tile property, id_str = $tile_id_str, id = $tile_id, value = $value');
+								tile_props.set(property_name, value);
+							}
+
+							property_tiles.set(tile_id, new TiledPropertyTile(tile_id, tile_props));
+						}
+
+					} //tileproperties
+
                 } //switch child nodename
 
         } //for each child
