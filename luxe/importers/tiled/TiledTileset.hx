@@ -144,7 +144,6 @@ class TiledTileset {
 							var properties = Reflect.field(child, tile_id_str);
 							for (property_name in Reflect.fields(properties)) {
 								var value:String = cast Reflect.field(properties, property_name);
-								trace('tile property, id_str = $tile_id_str, id = $tile_id, key = $property_name, value = $value');
 								tile_props.set(property_name, value);
 							}
 
